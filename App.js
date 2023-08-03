@@ -1,47 +1,40 @@
-import { useRef, useState } from "react";
-import {
-  Button,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  SafeAreaView,
-} from "react-native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { MediaScreen } from "./components/MediaScreen";
+import { CameraScreen } from "./components/cameraScreen";
+import { TouchableOpacity, View, Text } from "react-native";
 
 export default function App() {
+  const Stack = createStackNavigator();
+
   return (
-    <>
-      <SafeAreaView>
-        <View style={styles.container}>
-          <Text>Hello</Text>
-        </View>
-      </SafeAreaView>
-    </>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Media" component={MediaScreen} />
+        <Stack.Screen name="Camera" component={CameraScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "transparent",
-    margin: 64,
-  },
-  button: {
-    flex: 1,
-    alignSelf: "flex-end",
-    alignItems: "center",
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-  },
-});
+function HomeScreen({ navigation }) {
+  return (
+    <View
+      style={{
+        flex: 1,
+        flexDirection: "row",
+        gap: 32,
+        justifyContent: "space-around",
+        paddingVertical: 32,
+      }}
+    >
+      <TouchableOpacity onPress={() => navigation.navigate("Camera")}>
+        <Text>Camera</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("Media")}>
+        <Text>Media</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
