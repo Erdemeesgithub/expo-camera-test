@@ -1,5 +1,6 @@
 import * as MediaLibrary from "expo-media-library";
 import { useEffect, useState, Button } from "react";
+import gif from "../assets/gif.gif";
 import {
   Dimensions,
   FlatList,
@@ -7,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ImageBackground,
 } from "react-native";
 
 const windowWidth = Dimensions.get("window").width;
@@ -36,6 +38,31 @@ export function MediaScreen() {
       first: 21,
     });
     setPhotos([...photos, ...media.assets]);
+  }
+
+  async function handleUpload() {
+    const photo = selectedPhotos[0];
+
+    const info = await MediaLibrary.getAssetInfoAsync(photo);
+
+    console.log({ info });
+
+    const data = new FormData();
+    data.append("file", { uri: info.localUri, name: info.filename });
+    data.append("upload_preset", "ml_default");
+    data.append("cloud_name", "daczboj8k");
+
+    fetch("https://api.cloudinary.com/v1_1/daczboj8k/upload", {
+      method: "post",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data.secure_url);
+      })
+      .catch((err) => {
+        alert("An Error occured while Uploading");
+      });
   }
 
   useEffect(() => {
@@ -76,30 +103,58 @@ export function MediaScreen() {
       </View>
     );
   }
-  console.log({ permissionResponse, selectedPhotos });
 
   return (
-    <FlatList
-      onEndReached={loadMorePhotos}
-      numColumns={3}
-      data={photos}
-      renderItem={({ item, index }) => (
-        <ImageItem
-          onSelect={() => setSelectedPhotos([...selectedPhotos, item])}
-          onRemove={() =>
-            setSelectedPhotos(
-              selectedPhotos.filter((selected) => selected.id !== item.id)
-            )
-          }
-          selected={
-            selectedPhotos.findIndex((selected) => selected.id === item.id) + 1
-          }
-          photo={item}
-          index={index}
+    <>
+      <ImageBackground source={gif} resizeMode="cover" style={{ flex: 1 }}>
+        <FlatList
+          onEndReached={loadMorePhotos}
+          numColumns={3}
+          data={photos}
+          renderItem={({ item, index }) => (
+            <ImageItem
+              onSelect={() => setSelectedPhotos([...selectedPhotos, item])}
+              onRemove={() =>
+                setSelectedPhotos(
+                  selectedPhotos.filter((selected) => selected.id !== item.id)
+                )
+              }
+              selected={
+                selectedPhotos.findIndex(
+                  (selected) => selected.id === item.id
+                ) + 1
+              }
+              photo={item}
+              index={index}
+            />
+          )}
+          keyExtractor={(item) => item.uri}
         />
-      )}
-      keyExtractor={(item) => item.uri}
-    />
+        {selectedPhotos.length > 0 && (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              bottom: 20,
+              left: 20,
+              right: 20,
+              backgroundColor: "#FF69B4",
+              padding: 10,
+              alignItems: "center",
+              borderRadius: 30,
+            }}
+            onPress={handleUpload}
+          >
+            <Text
+              style={{
+                color: "white",
+              }}
+            >
+              Send
+            </Text>
+          </TouchableOpacity>
+        )}
+      </ImageBackground>
+    </>
   );
 }
 

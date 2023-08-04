@@ -73,6 +73,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "white",
+    color: "#FF69B4",
   },
 });
